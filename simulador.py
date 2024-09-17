@@ -53,7 +53,7 @@ class RiscVMachine:
             funct3 = instruction[17:20]
             rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
             rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
-            imm = instruction[0] + instruction[25] + instruction[1:7] + instruction[20:25]
+            imm = instruction[0] + instruction[24] + instruction[1:7] + instruction[20:24]
             offset = int(imm, 2)
 
             if funct3 == "000":  # beq
