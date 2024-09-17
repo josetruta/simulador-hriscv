@@ -58,11 +58,11 @@ class RiscVMachine:
 
             if funct3 == "000":  # beq
                 if self.registradores[rs1] == self.registradores[rs2]:
-                    self.pc = offset
+                    self.pc = offset * 4
                     return  # Skip PC increment
             elif funct3 == "001":  # bne
                 if self.registradores[rs1] != self.registradores[rs2]:
-                    self.pc = offset
+                    self.pc = offset * 4
                     return  # Skip PC increment
 
         elif opcode == "1101111":  # jal
@@ -71,7 +71,7 @@ class RiscVMachine:
 
             if rd != 0:
                 self.registradores[rd] = self.pc
-            self.pc = imm
+            self.pc = imm * 4
             return  # Skip PC increment
 
         elif opcode == "0000011":  # ld
@@ -89,12 +89,12 @@ class RiscVMachine:
             self.data_memory[rs1 + imm] = self.registradores[rs2]
 
         # Incrementando o PC para a próxima instrução
-        self.pc += 1
+        self.pc += 4
 
     def run(self):
         """Executar o código carregado até encontrar um NOP ou sair da memória"""
         while self.pc < len(self.instruction_memory):
-            instruction = self.instruction_memory[self.pc]
+            instruction = self.instruction_memory[self.pc // 4]
             if instruction == "00000000000000000000000000000000":  # NOP
                 break
             if instruction == "00000000000000000000000000010011": 

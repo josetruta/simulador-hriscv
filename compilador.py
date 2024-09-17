@@ -1,7 +1,5 @@
 import sys
 
-#José Erik Dionisio da Silva 119211122
-
 def ler_arquivo_asm(nome_arquivo):
     # Lê o conteúdo do arquivo .asm e retorna as linhas como uma lista de strings
     with open(nome_arquivo, 'r') as arquivo:
