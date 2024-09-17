@@ -95,7 +95,7 @@ def converter_instrucao_para_binario(instrucao, rotulos):
     elif partes[0] == 'beq':
         rs1 = converter_registrador(partes[1])
         rs2 = converter_registrador(partes[2])
-        offset = rotulos[partes[3]] - len(rotulos)  # Calcula o deslocamento relativo
+        offset = rotulos[partes[3]]
         opcode = '1100011'
         funct3 = '000'
         imm = converter_para_binario(offset, 12)
@@ -104,7 +104,7 @@ def converter_instrucao_para_binario(instrucao, rotulos):
     elif partes[0] == 'bne':
         rs1 = converter_registrador(partes[1])
         rs2 = converter_registrador(partes[2])
-        offset = rotulos[partes[3]] - len(rotulos)  # Calcula o deslocamento relativo
+        offset = rotulos[partes[3]]
         opcode = '1100011'
         funct3 = '001'
         imm = converter_para_binario(offset, 12)
@@ -112,7 +112,7 @@ def converter_instrucao_para_binario(instrucao, rotulos):
 
     elif partes[0] == 'jal':
         rd = converter_registrador(partes[1])
-        offset = rotulos[partes[2]] - len(rotulos)  # Calcula o deslocamento relativo
+        offset = rotulos[partes[2]]
         opcode = '1101111'
         instrucao_binaria = converter_para_binario(offset, 20) + converter_para_binario(rd, 5) + opcode
 
@@ -147,7 +147,7 @@ def compilar_asm_para_binario(nome_arquivo_asm):
             print(f"Rótulo identificado: {rotulo} na linha {linha_atual}")  # Adiciona linha para depuração
         else:
             instrucoes.append(linha)
-            linha_atual += 1
+        linha_atual += 1
 
     # Converte as instruções para binário
     instrucoes_binarias = []

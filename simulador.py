@@ -20,15 +20,14 @@ class RiscVMachine:
     def decode_execute(self, instruction):
         """Decodificar e executar a instrução"""
         opcode = instruction[-7:]  # Últimos 7 bits para opcode
-        rd = int(instruction[20:25], 2)  # Registrador destino (rd)
-        rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-        rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
-        imm = int(instruction[:12], 2)    # Imediato de 12 bits
 
         # Mapeamento de opcodes para instruções
         if opcode == "0110011":  # Instruções do tipo R (add, sub, and, or)
             funct3 = instruction[17:20]
             funct7 = instruction[:7]
+            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
+            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
+            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
 
             if funct3 == "000" and funct7 == "0000000":  # add
                 self.registradores[rd] = self.registradores[rs1] + self.registradores[rs2]
@@ -41,6 +40,10 @@ class RiscVMachine:
 
         elif opcode == "0010011":  # Instruções do tipo I (addi, andi)
             funct3 = instruction[17:20]
+            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
+            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
+            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+
             if funct3 == "000":  # addi
                 self.registradores[rd] = self.registradores[rs1] + imm
             elif funct3 == "111":  # andi
@@ -48,35 +51,53 @@ class RiscVMachine:
 
         elif opcode == "1100011":  # Instruções de controle de fluxo (beq, bne)
             funct3 = instruction[17:20]
-            offset = imm << 1
+            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
+            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
+            imm = instruction[0] + instruction[25] + instruction[1:7] + instruction[20:25]
+            offset = int(imm, 2)
+
             if funct3 == "000":  # beq
                 if self.registradores[rs1] == self.registradores[rs2]:
-                    self.pc += offset
+                    self.pc = offset
                     return  # Skip PC increment
             elif funct3 == "001":  # bne
                 if self.registradores[rs1] != self.registradores[rs2]:
-                    self.pc += offset
+                    self.pc = offset
                     return  # Skip PC increment
 
         elif opcode == "1101111":  # jal
-            self.registradores[rd] = self.pc + 4
-            self.pc += imm
+            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
+            imm = int(instruction[:20], 2)    # Imediato de 20 bits
+
+            if rd != 0:
+                self.registradores[rd] = self.pc
+            self.pc = imm
             return  # Skip PC increment
 
         elif opcode == "0000011":  # ld
+            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
+            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
+            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+
             self.registradores[rd] = self.data_memory[rs1 + imm]
 
         elif opcode == "0100011":  # sd
+            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
+            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
+            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+
             self.data_memory[rs1 + imm] = self.registradores[rs2]
 
         # Incrementando o PC para a próxima instrução
-        self.pc += 4
+        self.pc += 1
 
     def run(self):
         """Executar o código carregado até encontrar um NOP ou sair da memória"""
         while self.pc < len(self.instruction_memory):
-            instruction = self.instruction_memory[self.pc // 4]
-            if instruction == "00000000000000000000000000010011":  # NOP
+            instruction = self.instruction_memory[self.pc]
+            if instruction == "00000000000000000000000000000000":  # NOP
+                break
+            if instruction == "00000000000000000000000000010011": 
                 break
             self.decode_execute(instruction)
             #self.print_state()
