@@ -5,7 +5,7 @@ def ler_arquivo_asm(nome_arquivo):
     with open(nome_arquivo, 'r') as arquivo:
         linhas = arquivo.readlines()
     print(f"Linhas lidas do arquivo {nome_arquivo}:")
-    print(linhas)  # Adiciona linha para depuração
+    print(linhas)
     return linhas
 
 def converter_registrador(registrador):
@@ -14,7 +14,7 @@ def converter_registrador(registrador):
 
 def converter_para_binario(valor, bits):
     # Converte um valor inteiro para uma string binária com o número de bits especificado
-    binario = bin(valor & int('1' * bits, 2))[2:]  # Garante que o binário tenha o tamanho correto
+    binario = bin(valor & int('1' * bits, 2))[2:] 
     return binario.zfill(bits)  # Adiciona zeros à esquerda para garantir o tamanho
 
 def converter_instrucao_para_binario(instrucao, rotulos):
@@ -22,7 +22,7 @@ def converter_instrucao_para_binario(instrucao, rotulos):
     partes = [parte.strip().strip(',') for parte in instrucao.split()]
     instrucao_binaria = ''
 
-    print(f"Convertendo instrução: {partes}")  # Adiciona linha para depuração
+    print(f"Convertendo instrução: {partes}")
 
     if partes[0] == 'add':
         rd = converter_registrador(partes[1])
@@ -122,7 +122,7 @@ def converter_instrucao_para_binario(instrucao, rotulos):
     else:
         raise ValueError(f"Instrução desconhecida: {partes[0]}")
 
-    print(f"Instrução binária: {instrucao_binaria}")  # Adiciona linha para depuração
+    print(f"Instrução binária: {instrucao_binaria}") 
     return instrucao_binaria
 
 def compilar_asm_para_binario(nome_arquivo_asm):
@@ -142,7 +142,7 @@ def compilar_asm_para_binario(nome_arquivo_asm):
         if ':' in linha:
             rotulo = linha.replace(':', '').strip()
             rotulos[rotulo] = linha_atual
-            print(f"Rótulo identificado: {rotulo} na linha {linha_atual}")  # Adiciona linha para depuração
+            print(f"Rótulo identificado: {rotulo} na linha {linha_atual}") 
         else:
             instrucoes.append(linha)
         linha_atual += 1
@@ -150,7 +150,7 @@ def compilar_asm_para_binario(nome_arquivo_asm):
     # Converte as instruções para binário
     instrucoes_binarias = []
     for instrucao in instrucoes:
-        print(f"Instrução a ser convertida: {instrucao}")  # Adiciona linha para depuração
+        print(f"Instrução a ser convertida: {instrucao}") 
         instrucao_binaria = converter_instrucao_para_binario(instrucao, rotulos)
         instrucoes_binarias.append(instrucao_binaria)
 

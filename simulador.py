@@ -1,7 +1,6 @@
 import argparse
 
-# Definição do simulador
-class RiscVMachine:
+class hsriscv:
     def __init__(self):
         # Inicializando os registradores (r0 a r7) e o PC
         self.registradores = [0] * 8
@@ -12,22 +11,22 @@ class RiscVMachine:
         self.data_memory = [0] * 16
 
     def load_instructions(self, instructions):
-        """Carregar as instruções na memória de instruções"""
+        # Carregar as instruções na memória de instruções
         for i, instruction in enumerate(instructions):
             if i < 128:
                 self.instruction_memory[i] = instruction
 
     def decode_execute(self, instruction):
-        """Decodificar e executar a instrução"""
-        opcode = instruction[-7:]  # Últimos 7 bits para opcode
+        # Decodificar e executar a instrução
+        opcode = instruction[-7:] 
 
         # Mapeamento de opcodes para instruções
         if opcode == "0110011":  # Instruções do tipo R (add, sub, and, or)
             funct3 = instruction[17:20]
             funct7 = instruction[:7]
-            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
-            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
+            rd = int(instruction[20:25], 2)  
+            rs1 = int(instruction[12:17], 2) 
+            rs2 = int(instruction[7:12], 2)  
 
             if funct3 == "000" and funct7 == "0000000":  # add
                 self.registradores[rd] = self.registradores[rs1] + self.registradores[rs2]
@@ -40,9 +39,9 @@ class RiscVMachine:
 
         elif opcode == "0010011":  # Instruções do tipo I (addi, andi)
             funct3 = instruction[17:20]
-            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
-            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+            rd = int(instruction[20:25], 2)  
+            rs1 = int(instruction[12:17], 2)  
+            imm = int(instruction[:12], 2)    
 
             if funct3 == "000":  # addi
                 self.registradores[rd] = self.registradores[rs1] + imm
@@ -51,23 +50,23 @@ class RiscVMachine:
 
         elif opcode == "1100011":  # Instruções de controle de fluxo (beq, bne)
             funct3 = instruction[17:20]
-            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
+            rs1 = int(instruction[12:17], 2)  
+            rs2 = int(instruction[7:12], 2)   
             imm = instruction[0] + instruction[24] + instruction[1:7] + instruction[20:24]
             offset = int(imm, 2)
 
             if funct3 == "000":  # beq
                 if self.registradores[rs1] == self.registradores[rs2]:
                     self.pc = offset * 4
-                    return  # Skip PC increment
+                    return  
             elif funct3 == "001":  # bne
                 if self.registradores[rs1] != self.registradores[rs2]:
                     self.pc = offset * 4
-                    return  # Skip PC increment
+                    return  
 
         elif opcode == "1101111":  # jal
-            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
-            imm = int(instruction[:20], 2)    # Imediato de 20 bits
+            rd = int(instruction[20:25], 2)  
+            imm = int(instruction[:20], 2)    
 
             if rd != 0:
                 self.registradores[rd] = self.pc
@@ -75,46 +74,43 @@ class RiscVMachine:
             return  # Skip PC increment
 
         elif opcode == "0000011":  # ld
-            rd = int(instruction[20:25], 2)  # Registrador destino (rd)
-            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+            rd = int(instruction[20:25], 2)  
+            rs1 = int(instruction[12:17], 2)  
+            imm = int(instruction[:12], 2)   
 
             self.registradores[rd] = self.data_memory[rs1 + imm]
 
         elif opcode == "0100011":  # sd
-            rs1 = int(instruction[12:17], 2)  # Primeiro registrador de origem (rs1)
-            rs2 = int(instruction[7:12], 2)   # Segundo registrador de origem (rs2)
-            imm = int(instruction[:12], 2)    # Imediato de 12 bits
+            rs1 = int(instruction[12:17], 2)  
+            rs2 = int(instruction[7:12], 2)   
+            imm = int(instruction[:12], 2)   
 
             self.data_memory[rs1 + imm] = self.registradores[rs2]
 
-        # Incrementando o PC para a próxima instrução
         self.pc += 4
 
     def run(self):
-        """Executar o código carregado até encontrar um NOP ou sair da memória"""
+        # Executar o código carregado até encontrar um NOP, fim das instruções ou sair da memória
         while self.pc < len(self.instruction_memory):
             instruction = self.instruction_memory[self.pc // 4]
-            if instruction == "00000000000000000000000000000000":  # NOP
+            if instruction == "00000000000000000000000000000000":
                 break
             if instruction == "00000000000000000000000000010011": 
                 break
             self.decode_execute(instruction)
-            #self.print_state()
 
     def print_state(self):
-        """Imprimir o estado atual dos registradores e do PC"""
+        # Imprimir o estado atual dos registradores e do PC
         print(f"PC: {self.pc}")
         for i, reg in enumerate(self.registradores):
             print(f"r{i}: {reg}")
 
-# Função para ler o arquivo de instruções
 def load_from_file(filename):
+    # Função para ler o arquivo de instruções
     with open(filename, 'r') as file:
         instructions = [line.strip() for line in file.readlines()]
     return instructions
 
-# Exemplo de uso
 if __name__ == "__main__":
 
     # Configurando o argparse para receber o arquivo pela linha de comando
@@ -122,17 +118,9 @@ if __name__ == "__main__":
     parser.add_argument("arquivo", help="Caminho para o arquivo .txt com as instruções em binário.")
     args = parser.parse_args()
     
-    # Criando a máquina
-    machine = RiscVMachine()
-
-    # Carregando as instruções de um arquivo .txt
+    machine = hsriscv()
     instructions = load_from_file(args.arquivo)
-
-    # Carregando as instruções na memória da máquina
+    
     machine.load_instructions(instructions)
-
-    # Executando as instruções
     machine.run()
-
-    # Imprimindo o estado final da máquina
     machine.print_state()
