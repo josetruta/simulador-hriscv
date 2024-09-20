@@ -137,6 +137,8 @@ def compilar_asm_para_binario(nome_arquivo_asm):
         linha = linha.strip()
         if not linha or linha.startswith('#'):  # Ignora linhas vazias e comentários
             continue
+
+        linha = linha.split("#")[0]
         
         # Verifica se a linha é um rótulo (exemplo: loop:)
         if ':' in linha:
@@ -145,7 +147,7 @@ def compilar_asm_para_binario(nome_arquivo_asm):
             print(f"Rótulo identificado: {rotulo} na linha {linha_atual}") 
         else:
             instrucoes.append(linha)
-        linha_atual += 1
+            linha_atual += 1
 
     # Converte as instruções para binário
     instrucoes_binarias = []

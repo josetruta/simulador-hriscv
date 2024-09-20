@@ -71,7 +71,7 @@ class hsriscv:
             if rd != 0:
                 self.registradores[rd] = self.pc
             self.pc = imm * 4
-            return  # Skip PC increment
+            return 
 
         elif opcode == "0000011":  # ld
             rd = int(instruction[20:25], 2)  
