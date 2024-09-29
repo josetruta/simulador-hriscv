@@ -64,17 +64,19 @@ def converter_instrucao_para_binario(instrucao, rotulos):
         rd = converter_registrador(partes[1])
         rs1 = converter_registrador(partes[2])
         imm = int(partes[3])
+        imm = format((1 << 12) + imm, '012b') if imm < 0 else format(imm, '012b')
         opcode = '0010011'
         funct3 = '000'
-        instrucao_binaria = converter_para_binario(imm, 12) + converter_para_binario(rs1, 5) + funct3 + converter_para_binario(rd, 5) + opcode
+        instrucao_binaria = imm + converter_para_binario(rs1, 5) + funct3 + converter_para_binario(rd, 5) + opcode
 
     elif partes[0] == 'andi':
         rd = converter_registrador(partes[1])
         rs1 = converter_registrador(partes[2])
         imm = int(partes[3])
+        imm = format((1 << 12) + imm, '012b') if imm < 0 else format(imm, '012b')
         opcode = '0010011'
         funct3 = '111'
-        instrucao_binaria = converter_para_binario(imm, 12) + converter_para_binario(rs1, 5) + funct3 + converter_para_binario(rd, 5) + opcode
+        instrucao_binaria = imm + converter_para_binario(rs1, 5) + funct3 + converter_para_binario(rd, 5) + opcode
 
     elif partes[0] == 'ld':
         rd = converter_registrador(partes[1])

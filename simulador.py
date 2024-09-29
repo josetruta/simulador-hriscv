@@ -1,4 +1,4 @@
-import argparse
+import sys
 
 class hsriscv:
     def __init__(self):
@@ -41,7 +41,9 @@ class hsriscv:
             funct3 = instruction[17:20]
             rd = int(instruction[20:25], 2)  
             rs1 = int(instruction[12:17], 2)  
-            imm = int(instruction[:12], 2)    
+
+            imm_bin = instruction[:12]
+            imm = int(imm_bin, 2) if imm_bin[0] == '0' else int(imm_bin, 2) - (1 << 12)   
 
             if funct3 == "000":  # addi
                 self.registradores[rd] = self.registradores[rs1] + imm
@@ -65,8 +67,8 @@ class hsriscv:
                     return  
 
         elif opcode == "1101111":  # jal
-            rd = int(instruction[20:25], 2)  
-            imm = int(instruction[:20], 2)    
+            rd = int(instruction[20:25], 2)
+            imm = int(instruction[:20], 2)     
 
             if rd != 0:
                 self.registradores[rd] = self.pc
@@ -113,13 +115,10 @@ def load_from_file(filename):
 
 if __name__ == "__main__":
 
-    # Configurando o argparse para receber o arquivo pela linha de comando
-    parser = argparse.ArgumentParser(description="Simulador de uma máquina RISC-V hipotética.")
-    parser.add_argument("arquivo", help="Caminho para o arquivo .txt com as instruções em binário.")
-    args = parser.parse_args()
+    arquivo = sys.argv[1]
+    instructions = load_from_file(arquivo)
     
     machine = hsriscv()
-    instructions = load_from_file(args.arquivo)
     
     machine.load_instructions(instructions)
     machine.run()
